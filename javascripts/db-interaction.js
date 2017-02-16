@@ -86,10 +86,13 @@ function searchFirebase(searchString){
             url: `https://movie-history-6e707.firebaseio.com/movies.json`,
             type: "GET"
         }).done( function(movieData){
-            for(var i = 0; i < movieData.length; i++){
-              tempMovie = movieData[i].title.toLowerCase();
+            var movies = Object.values(movieData);
+            var myMovies = filterUser(movies);
+
+            for(var i = 0; i < myMovies.length; i++){
+              tempMovie = myMovies[i].title.toLowerCase();
                 if(tempMovie.includes(searchString)){
-                    foundMovies.push(movieData[i]);
+                    foundMovies.push(myMovies[i]);
                 }
             }
             resolve(foundMovies);
@@ -101,20 +104,35 @@ function searchFirebase(searchString){
 }
 
 function getAllMovies(){
-  return new Promise(function(resolve, reject){
-    $.ajax({
-      // url: `https://movie-history-6e707.firebaseio.com?orderBy="uid"&equalTo="${user}"`
-      url: `https://movie-history-6e707.firebaseio.com/movies.json`,
-      type: "GET"
-    }).done( function(movieData){
-        var movies = Object.values(movieData);
-        resolve(movies);
-    }).fail( function(error){
-      console.log("ERROR");
-      reject(error);
+    return new Promise(function(resolve, reject){
+        $.ajax({
+            url: `https://movie-history-6e707.firebaseio.com/movies.json`,
+            type: "GET"
+        }).done( function(movieData){
+            var movies = Object.values(movieData);
+            var myMovies = filterUser(movies);
+            resolve(myMovies);
+        }).fail( function(error){
+            console.log("ERROR");
+            reject(error);
+        });
     });
-  });
 }
+
+
 
 module.exports = {getMovies, addToMyMovies, deleteMovie, searchFirebase, getAllMovies};
 
+
+
+// NOT SUPPOSED TO BE EXPORTED
+// This function is just used within the prior functions for more clarity/modularization
+function filterUser(movies){
+    var filteredMovies = [];
+    for(var i = 0; i < movies.length; i++){
+        if(movies[i].userID === user.getUser()){
+            filteredMovies.push(movies[i]);
+        }
+    } 
+    return filteredMovies;
+}
