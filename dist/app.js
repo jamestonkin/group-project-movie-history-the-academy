@@ -306,12 +306,9 @@ function showMyFavoriteMovies(userMovies) {
 //probably need to use the first part of the below link for grabbing the poster from the api
 //https://image.tmdb.org/t/p/w500/kqjL17yufvn9OVLyXYpvtyrFfak.jpg
 
-<<<<<<< HEAD
 module.exports = {showSearch, showMyMovies, showMyWatchedMovies, showMyFavoriteMovies};
-=======
-module.exports = {showSearch};
 
->>>>>>> master
+
 },{"./db-interaction.js":2,"./user.js":7,"hbsfy/runtime":30,"jquery":31}],4:[function(require,module,exports){
 "use strict";
 
@@ -324,7 +321,6 @@ function getKey() {
 }
 
 module.exports = getKey;
-
 },{}],5:[function(require,module,exports){
 "use strict";
 let firebase = require("firebase/app"),
@@ -501,46 +497,31 @@ function findDuplicates(searchedMovies, firebaseMoviesFound){
 }
 
 
-<<<<<<< HEAD
 // Slider
-=======
-// Slider 
->>>>>>> master
 $(document).on("input", "#slider", function(event){
     var newNum = parseInt(event.target.value);
 
     db.getAllMovies()
     .then( function(movies){
-<<<<<<< HEAD
         console.log("MY MOVIES: ", movies);
-=======
-
->>>>>>> master
         var filteredMovies = [];
         for(var i = 0; i < movies.length; i++){
             if(parseInt(movies[i].rating) >= newNum){
                 filteredMovies.push(movies[i]);
             }
         }
-<<<<<<< HEAD
         if(filteredMovies.length === 0){
             // Tell user that they have no movies with this rating or greater
         }
         console.log("FILTERED: ", filteredMovies);
         // Populate DOM with filteredMovies here
         movieBuilder.showMyFavoriteMovies(filteredMovies);
-=======
-        console.log("FILTERED: ", filteredMovies);
->>>>>>> master
     });
 });
 
 
-<<<<<<< HEAD
 
 
-=======
->>>>>>> master
 
 },{"./api-interaction.js":1,"./db-interaction":2,"./dom-movie-builder":3,"./user":7,"jquery":31}],7:[function(require,module,exports){
 "use strict";
