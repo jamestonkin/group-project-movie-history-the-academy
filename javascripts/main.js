@@ -42,6 +42,10 @@ $("#auth-btn").click(function(){
     user.setUser(results.user.uid);
     $(".select-button").show();
     $("#current-list-visible").html("My Movies");
+    db.getAllMovies()
+    .then( function(movies){
+      console.log("Movies: ", movies);
+    });
 
   });
 });
@@ -151,7 +155,7 @@ $(document).on("input", "#slider", function(event){
 
     db.getAllMovies()
     .then( function(movies){
-
+        console.log("MY MOVIES: ", movies);
         var filteredMovies = [];
         for(var i = 0; i < movies.length; i++){
             if(parseInt(movies[i].rating) >= newNum){
@@ -161,5 +165,7 @@ $(document).on("input", "#slider", function(event){
         console.log("FILTERED: ", filteredMovies);
     });
 });
+
+
 
 
