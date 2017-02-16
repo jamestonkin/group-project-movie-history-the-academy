@@ -178,6 +178,46 @@ function showSearch(movieData) {
     $(".add-to-my-movies").click(db.addToMyMovies);
 }
 
+function showMyMovies(userMovies) {
+    $("#my-movies").html("");
+    console.log('userMovies = ', userMovies);
+    for (var i = 0; i <userMovies.length; i++) {
+        if (userMovies[i].rating < 1) {
+            $("#my-movies").append(
+                                        `<section id="card-${userMovies[i].id}" class="card-wrapper col-xs-4" >
+                                            <div class="innerCard" style="border: 2px solid black">
+                                                <h3 class="movie-header">${userMovies[i].title}</h3>
+                                                <h4 class="movie-year">${userMovies[i].year}</h4>
+                                                <img src="${userMovies[i].posterURL}" height="200" >
+                                                <h5>${userMovies[i].actors}</h5>
+                                                <h6>User Rating: ${userMovies[i].rating}</h6>
+                                                <button type="button" value="Delete">Delete</button>
+                                            </div>
+                                        </section>`);
+        }
+    }
+}
+
+function showMyWatchedMovies(userMovies) {
+    $("#my-watched-movies").html("");
+    console.log('userMovies = ', userMovies);
+    for (var i = 0; i <userMovies.length; i++) {
+        if (userMovies[i].rating >= 1) {
+            $("#my-watched-movies").append(
+                                        `<section id="card-${userMovies[i].id}" class="card-wrapper col-xs-4" >
+                                            <div class="innerCard" style="border: 2px solid black">
+                                                <h3 class="movie-header">${userMovies[i].title}</h3>
+                                                <h4 class="movie-year">${userMovies[i].year}</h4>
+                                                <img src="${userMovies[i].posterURL}" height="200" >
+                                                <h5>${userMovies[i].actors}</h5>
+                                                <h6>User Rating: ${userMovies[i].rating}</h6>
+                                                <button type="button" value="Delete">Delete</button>
+                                            </div>
+                                        </section>`);
+        }
+    }
+}
+
 // Helper functions for forms stuff. Nothing related to Firebase
 // Build a movie obj from form data.
 // function buildMovieObj() {//this function needs work, but I don't want to mess with it quite yet
@@ -207,7 +247,7 @@ function showSearch(movieData) {
 //probably need to use the first part of the below link for grabbing the poster from the api
 //https://image.tmdb.org/t/p/w500/kqjL17yufvn9OVLyXYpvtyrFfak.jpg
 
-module.exports = {showSearch};
+module.exports = {showSearch, showMyMovies, showMyWatchedMovies};
 },{"./db-interaction.js":2,"./user.js":7,"hbsfy/runtime":30,"jquery":31}],4:[function(require,module,exports){
 "use strict";
 
@@ -248,7 +288,8 @@ let $ = require('jquery'),
 
     movieBuilder = require("./dom-movie-builder"),
     user = require("./user"),
-    api = require("./api-interaction.js");
+    api = require("./api-interaction.js"),
+    userMovies = [];
 
 user.logOut();
 
@@ -278,6 +319,7 @@ function loadMoviesToDOM(input) {
 
 // listener that askes the user to log in with google when "Sign in" is clicked
 $("#auth-btn").click(function(){
+
   console.log("clicked auth");
   user.logInGoogle()
   .then(function(results){
@@ -285,7 +327,11 @@ $("#auth-btn").click(function(){
     user.setUser(results.user.uid);
     $(".select-button").show();
     $("#current-list-visible").html("My Movies");
-
+    db.getAllMovies()
+    .then(function(movies){
+      console.log('movies in auth click', movies);
+      userMovies = movies;
+    });
   });
 });
 
@@ -351,10 +397,12 @@ $(".select-button").click(function(event) {
   if (event.currentTarget.id === "unwatched-btn"){
 		$("#current-list-visible").html("My Unwatched Movies");
 		$("#my-movies").show();
+    movieBuilder.showMyMovies(userMovies);
   }
   if (event.currentTarget.id === "watched-btn") {
 		$("#current-list-visible").html("My Watched Movies");
 		$("#my-watched-movies").show();
+    movieBuilder.showMyWatchedMovies(userMovies);
 	}
 	if (event.currentTarget.id === "favorites-btn") {
 		$("#current-list-visible").html("My Favorites");
@@ -386,6 +434,24 @@ function findDuplicates(searchedMovies, firebaseMoviesFound){
     }
     console.log("FINAL MOVIES THAT WILL POPULATE THE DOM (upon hitting enter):\n", combinedMoviesToShow);
 }
+
+
+// Slider
+$(document).on("input", "#slider", function(event){
+    var newNum = parseInt(event.target.value);
+
+    db.getAllMovies()
+    .then( function(movies){
+
+        var filteredMovies = [];
+        for(var i = 0; i < movies.length; i++){
+            if(parseInt(movies[i].rating) >= newNum){
+                filteredMovies.push(movies[i]);
+            }
+        }
+        console.log("FILTERED: ", filteredMovies);
+    });
+});
 
 
 

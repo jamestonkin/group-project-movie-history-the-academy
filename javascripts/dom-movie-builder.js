@@ -31,6 +31,46 @@ function showSearch(movieData) {
     $(".add-to-my-movies").click(db.addToMyMovies);
 }
 
+function showMyMovies(userMovies) {
+    $("#my-movies").html("");
+    console.log('userMovies = ', userMovies);
+    for (var i = 0; i <userMovies.length; i++) {
+        if (userMovies[i].rating < 1) {
+            $("#my-movies").append(
+                                        `<section id="card-${userMovies[i].id}" class="card-wrapper col-xs-4" >
+                                            <div class="innerCard" style="border: 2px solid black">
+                                                <h3 class="movie-header">${userMovies[i].title}</h3>
+                                                <h4 class="movie-year">${userMovies[i].year}</h4>
+                                                <img src="${userMovies[i].posterURL}" height="200" >
+                                                <h5>${userMovies[i].actors}</h5>
+                                                <h6>User Rating: ${userMovies[i].rating}</h6>
+                                                <button type="button" value="Delete">Delete</button>
+                                            </div>
+                                        </section>`);
+        }
+    }
+}
+
+function showMyWatchedMovies(userMovies) {
+    $("#my-watched-movies").html("");
+    console.log('userMovies = ', userMovies);
+    for (var i = 0; i <userMovies.length; i++) {
+        if (userMovies[i].rating >= 1) {
+            $("#my-watched-movies").append(
+                                        `<section id="card-${userMovies[i].id}" class="card-wrapper col-xs-4" >
+                                            <div class="innerCard" style="border: 2px solid black">
+                                                <h3 class="movie-header">${userMovies[i].title}</h3>
+                                                <h4 class="movie-year">${userMovies[i].year}</h4>
+                                                <img src="${userMovies[i].posterURL}" height="200" >
+                                                <h5>${userMovies[i].actors}</h5>
+                                                <h6>User Rating: ${userMovies[i].rating}</h6>
+                                                <button type="button" value="Delete">Delete</button>
+                                            </div>
+                                        </section>`);
+        }
+    }
+}
+
 // Helper functions for forms stuff. Nothing related to Firebase
 // Build a movie obj from form data.
 // function buildMovieObj() {//this function needs work, but I don't want to mess with it quite yet
@@ -60,4 +100,4 @@ function showSearch(movieData) {
 //probably need to use the first part of the below link for grabbing the poster from the api
 //https://image.tmdb.org/t/p/w500/kqjL17yufvn9OVLyXYpvtyrFfak.jpg
 
-module.exports = {showSearch};
+module.exports = {showSearch, showMyMovies, showMyWatchedMovies};
