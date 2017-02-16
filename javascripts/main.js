@@ -9,45 +9,36 @@ let $ = require('jquery'),
 
 user.logOut();
 
+
 $( document ).ready(function() {
-// Hides buttons and divs until logged in
-  $(".select-button").hide();
-  $(".hidden-div").hide();
+    // Hides buttons and divs until logged in
+    $(".select-button").hide();
+    $(".hidden-div").hide();
 });
 
 // Using the REST API
 function loadMoviesToDOM(input) {
-  console.log("Where the movies at??", input);
-  db.getMovies(input)
-  .then((movieData)=>{//movieData comes from the getMovies function, by the resolution of the Promise
-    console.log("got data", movieData);
-    // var idArray = Object.keys(movieData);//putting all the keys (in this case, movie names) from the movie list on firebase
-    // idArray.forEach(function(key){
-    //   console.log("MovieData[i]: ", movieData[key]);
-    //   movieData[key].id = key;//this function is getting all of movie ids that are tied to the movie names, preparing the info to be sent into the function that will make the movie list
-    // });
-    // console.log("movie object with id", movieData);
-    // NEED TO POPULATE DOM HERE
-    movieBuilder.showSearch(movieData);
-
-  });
+    console.log("Where the movies at??", input);
+    db.getMovies(input)
+    .then((movieData)=>{//movieData comes from the getMovies function, by the resolution of the Promise
+        // NEED TO POPULATE DOM HERE
+        movieBuilder.showSearch(movieData);
+    });
 }
 
 // listener that askes the user to log in with google when "Sign in" is clicked
 $("#auth-btn").click(function(){
-  console.log("clicked auth");
-  user.logInGoogle()
-  .then(function(results){
-    console.log("result from login", results.user.uid);
-    user.setUser(results.user.uid);
-    $(".select-button").show();
-    $("#current-list-visible").html("My Movies");
-    db.getAllMovies()
-    .then( function(movies){
-      console.log("Movies: ", movies);
+    console.log("clicked auth");
+    user.logInGoogle()
+    .then(function(results){
+        user.setUser(results.user.uid);
+        $(".select-button").show();
+        $("#current-list-visible").html("My Movies");
+        db.getAllMovies()
+        .then( function(movies){
+            console.log("Your Movies: ", movies);
+        });
     });
-
-  });
 });
 
 // listener that logs the user out when "logout" is clicked
@@ -145,7 +136,7 @@ function findDuplicates(searchedMovies, firebaseMoviesFound){
             }
         }
     }
-    console.log("FINAL MOVIES THAT WILL POPULATE THE DOM (upon hitting enter):\n", combinedMoviesToShow);
+    console.log("MOVIES THAT WILL POPULATE THE DOM (upon hitting enter):\n", combinedMoviesToShow);
 }
 
 
@@ -162,7 +153,11 @@ $(document).on("input", "#slider", function(event){
                 filteredMovies.push(movies[i]);
             }
         }
+        if(filteredMovies.length === 0){
+            // Tell user that they have no movies with this rating or greater
+        }
         console.log("FILTERED: ", filteredMovies);
+        // Populate DOM with filteredMovies here
     });
 });
 
