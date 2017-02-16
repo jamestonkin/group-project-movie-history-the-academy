@@ -29,8 +29,6 @@ function loadMoviesToDOM(input) {
 
 // listener that askes the user to log in with google when "Sign in" is clicked
 $("#auth-btn").click(function(){
-<<<<<<< HEAD
-
   console.log("clicked auth");
   user.logInGoogle()
   .then(function(results){
