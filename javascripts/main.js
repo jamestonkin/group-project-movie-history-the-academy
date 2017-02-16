@@ -106,16 +106,24 @@ $(".select-button").click(function(event) {
   if (event.currentTarget.id === "unwatched-btn"){
 		$("#current-list-visible").html("My Unwatched Movies");
 		$("#my-movies").show();
-    movieBuilder.showMyMovies(userMovies);
+        db.getAllMovies()
+        .then(function(movies) {
+            console.log('movies = ', movies);
+            movieBuilder.showMyMovies(movies);
+        });
   }
   if (event.currentTarget.id === "watched-btn") {
 		$("#current-list-visible").html("My Watched Movies");
 		$("#my-watched-movies").show();
-    movieBuilder.showMyWatchedMovies(userMovies);
+        db.getAllMovies()
+        .then(function(movies) {
+            movieBuilder.showMyWatchedMovies(movies);
+        });
 	}
 	if (event.currentTarget.id === "favorites-btn") {
 		$("#current-list-visible").html("My Favorites");
 		$("#favorites").show();
+        db.getAllMovies();
 	}
 });
 
@@ -163,6 +171,7 @@ $(document).on("input", "#slider", function(event){
         }
         console.log("FILTERED: ", filteredMovies);
         // Populate DOM with filteredMovies here
+        movieBuilder.showMyFavoriteMovies(filteredMovies);
     });
 });
 
