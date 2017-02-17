@@ -106,7 +106,17 @@ function showMyMovies(userMovies) {
                                         </section>`);
         }
     }
-    $(".delete-button").click();
+    $(".delete-button").click(function() {
+        var currentCard = $(event.currentTarget);
+        var currentTitle = currentCard.siblings("h3").html();
+        console.log('delete title = ', currentTitle);
+        db.deleteMovie(currentTitle);
+        db.getAllMovies()
+        .then(function(movies) {
+            console.log('movies = ', movies);
+            showMyMovies(movies);
+        });
+    });
 }
 
 function showMyWatchedMovies(userMovies) {
@@ -127,12 +137,23 @@ function showMyWatchedMovies(userMovies) {
                                                 <img src="${userMovies[i].posterURL}" height="200" >
                                                 <h5>${userMovies[i].actors}</h5>
                                                 <h6>My Rating: ${myStars}</h6>
-                                                <button type="button" value="Delete">Delete</button>
+                                                <button type="button" class="delete-button" value="Delete">Delete</button>
                                             </div>
                                         </section>`);
         }
         myStars = "";
     }
+    $(".delete-button").click(function() {
+        var currentCard = $(event.currentTarget);
+        var currentTitle = currentCard.siblings("h3").html();
+        console.log('delete title = ', currentTitle);
+        db.deleteMovie(currentTitle);
+        db.getAllMovies()
+        .then(function(movies) {
+            console.log('movies = ', movies);
+            showMyWatchedMovies(movies);
+        });
+    });
 }
 
 function showMyFavoriteMovies(userMovies) {
@@ -152,11 +173,22 @@ function showMyFavoriteMovies(userMovies) {
                                             <img src="${userMovies[i].posterURL}" height="200" >
                                             <h5>${userMovies[i].actors}</h5>
                                             <h6>User Rating: ${myStars}</h6>
-                                            <button type="button" value="Delete">Delete</button>
+                                            <button type="button" class="delete-button" value="Delete">Delete</button>
                                         </div>
                                     </section>`);
     myStars = "";
     }
+    $(".delete-button").click(function() {
+        var currentCard = $(event.currentTarget);
+        var currentTitle = currentCard.siblings("h3").html();
+        console.log('delete title = ', currentTitle);
+        db.deleteMovie(currentTitle);
+        db.getAllMovies()
+        .then(function(movies) {
+            console.log('movies = ', movies);
+            showMyFavoriteMovies(movies);
+        });
+    });
 }
 
 module.exports = {showSearch, showMyMovies, showMyWatchedMovies, showMyFavoriteMovies};
