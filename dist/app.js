@@ -68,7 +68,7 @@ function getMovies(searchResult){
 function addToMyMovies() {
     console.log('you clicked I want to see this movie');
     var currentCard = $(event.currentTarget);
-    console.log('url:', currentCard.siblings("img").attr("src"));
+    // console.log('url:', currentCard.siblings("img").attr("src"));
     var currentUser = user.getUser();
     var myMovie = {
         "title": currentCard.siblings("h3").html(),
@@ -91,15 +91,28 @@ function addToMyMovies() {
 }
 
 // Deletes a movie using the movie's UID
-function deleteMovie(movieID){
-  return new Promise( function(resolve, reject){
+function deleteMovie(movieTitle){
+    // console.log('movieTitle = ', movieTitle);
+    var currentUser = user.getUser();
     $.ajax({
-      url: `https://movie-history-6e707.firebaseio.com/movies/${movieID}.json`,
-      method: "DELETE"
-    }).done( function(){
-      resolve();
+        url: `https://movie-history-6e707.firebaseio.com/movies.json`,
+        type: "GET"
+    }).done(function(movieData){
+        // console.log('movieData = ', movieData);
+        var moviesKeys = Object.keys(movieData);
+        var moviesObjects = Object.values(movieData);
+        // console.log('movies in deleteMovie = ', movies);
+        for (var i = 0; i < moviesObjects.length; i++) {
+            if (currentUser === moviesObjects[i].userID && movieTitle === moviesObjects[i].title) {
+                console.log('movie that matches userID and title of delete button = ', moviesKeys[i]);
+                $.ajax({
+                    url: `https://movie-history-6e707.firebaseio.com/movies/${moviesKeys[i]}.json`,
+                    method: "DELETE"
+                });
+            }
+        }
+
     });
-  });
 }
 
 function searchFirebase(searchString){
@@ -270,7 +283,17 @@ function showMyMovies(userMovies) {
                                         </section>`);
         }
     }
-    $(".delete-button").click();
+    $(".delete-button").click(function() {
+        var currentCard = $(event.currentTarget);
+        var currentTitle = currentCard.siblings("h3").html();
+        console.log('delete title = ', currentTitle);
+        db.deleteMovie(currentTitle);
+        db.getAllMovies()
+        .then(function(movies) {
+            console.log('movies = ', movies);
+            showMyMovies(movies);
+        });
+    });
 }
 
 function showMyWatchedMovies(userMovies) {
@@ -291,12 +314,23 @@ function showMyWatchedMovies(userMovies) {
                                                 <img src="${userMovies[i].posterURL}" height="200" >
                                                 <h5>${userMovies[i].actors}</h5>
                                                 <h6>My Rating: ${myStars}</h6>
-                                                <button type="button" value="Delete">Delete</button>
+                                                <button type="button" class="delete-button" value="Delete">Delete</button>
                                             </div>
                                         </section>`);
         }
         myStars = "";
     }
+    $(".delete-button").click(function() {
+        var currentCard = $(event.currentTarget);
+        var currentTitle = currentCard.siblings("h3").html();
+        console.log('delete title = ', currentTitle);
+        db.deleteMovie(currentTitle);
+        db.getAllMovies()
+        .then(function(movies) {
+            console.log('movies = ', movies);
+            showMyWatchedMovies(movies);
+        });
+    });
 }
 
 function showMyFavoriteMovies(userMovies) {
@@ -316,11 +350,22 @@ function showMyFavoriteMovies(userMovies) {
                                             <img src="${userMovies[i].posterURL}" height="200" >
                                             <h5>${userMovies[i].actors}</h5>
                                             <h6>User Rating: ${myStars}</h6>
-                                            <button type="button" value="Delete">Delete</button>
+                                            <button type="button" class="delete-button" value="Delete">Delete</button>
                                         </div>
                                     </section>`);
     myStars = "";
     }
+    $(".delete-button").click(function() {
+        var currentCard = $(event.currentTarget);
+        var currentTitle = currentCard.siblings("h3").html();
+        console.log('delete title = ', currentTitle);
+        db.deleteMovie(currentTitle);
+        db.getAllMovies()
+        .then(function(movies) {
+            console.log('movies = ', movies);
+            showMyFavoriteMovies(movies);
+        });
+    });
 }
 
 module.exports = {showSearch, showMyMovies, showMyWatchedMovies, showMyFavoriteMovies};
