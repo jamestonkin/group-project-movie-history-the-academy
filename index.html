@@ -26,10 +26,10 @@
   <div id="movie-container" class="container">
     <h2 id="current-list-visible"></h2>
     <div id="buttons-container">
-      <input id="search-results-btn" type="button" value="Show Untracked" class="btn select-button">
-      <input id="unwatched-btn" type="button" value="Show Unwatched" class="btn select-button">
-      <input id="watched-btn" type="button" value="Show Watched" class="btn select-button">
-      <input id="favorites-btn" type="button" value="Favorites" class="btn select-button">
+      <input id="search-results-btn" type="button" value="MySearch" class="btn select-button">
+      <input id="unwatched-btn" type="button" value="MyMovies" class="btn select-button">
+      <input id="watched-btn" type="button" value="MyWatched Movies" class="btn select-button">
+      <input id="favorites-btn" type="button" value="MyFavorites" class="btn select-button">
     </div>
 
     <div id="search-results" class="container hidden-div">
@@ -42,10 +42,10 @@
       <h2>MY WATCHED MOVIES</h2>
     </div>
     <div id="favorites" class="container hidden-div">
-        <h2>FAVORITES</h2>
         <div id="slider-container">
             <input type="range" min="1" max="10" value="10" step="1" id="slider">
         </div>
+        <div id="my-favorite-movies"></div>
     </div>
     <!-- <h2>Star test</h2>
     <div class="stars">

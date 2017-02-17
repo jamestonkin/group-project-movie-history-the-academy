@@ -50,7 +50,7 @@ function addToMyMovies() {
         "year": currentCard.siblings("h4").html(),
         "actors": currentCard.siblings("h5").html(),
         "userID": currentUser,
-        "rating": "",
+        "rating": 0,
         "posterURL": currentCard.siblings("img").attr("src")
     };
     return new Promise (function(resolve, reject) {
@@ -133,6 +133,6 @@ function filterUser(movies){
         if(movies[i].userID === user.getUser()){
             filteredMovies.push(movies[i]);
         }
-    } 
+    }
     return filteredMovies;
 }

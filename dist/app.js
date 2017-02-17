@@ -75,7 +75,7 @@ function addToMyMovies() {
         "year": currentCard.siblings("h4").html(),
         "actors": currentCard.siblings("h5").html(),
         "userID": currentUser,
-        "rating": "",
+        "rating": 0,
         "posterURL": currentCard.siblings("img").attr("src")
     };
     return new Promise (function(resolve, reject) {
@@ -111,10 +111,13 @@ function searchFirebase(searchString){
             url: `https://movie-history-6e707.firebaseio.com/movies.json`,
             type: "GET"
         }).done( function(movieData){
-            for(var i = 0; i < movieData.length; i++){
-              tempMovie = movieData[i].title.toLowerCase();
+            var movies = Object.values(movieData);
+            var myMovies = filterUser(movies);
+
+            for(var i = 0; i < myMovies.length; i++){
+              tempMovie = myMovies[i].title.toLowerCase();
                 if(tempMovie.includes(searchString)){
-                    foundMovies.push(movieData[i]);
+                    foundMovies.push(myMovies[i]);
                 }
             }
             resolve(foundMovies);
@@ -126,24 +129,38 @@ function searchFirebase(searchString){
 }
 
 function getAllMovies(){
-  return new Promise(function(resolve, reject){
-    $.ajax({
-      // url: `https://movie-history-6e707.firebaseio.com?orderBy="uid"&equalTo="${user}"`
-      url: `https://movie-history-6e707.firebaseio.com/movies.json`,
-      type: "GET"
-    }).done( function(movieData){
-        var movies = Object.values(movieData);
-        resolve(movies);
-    }).fail( function(error){
-      console.log("ERROR");
-      reject(error);
+    return new Promise(function(resolve, reject){
+        $.ajax({
+            url: `https://movie-history-6e707.firebaseio.com/movies.json`,
+            type: "GET"
+        }).done( function(movieData){
+            var movies = Object.values(movieData);
+            var myMovies = filterUser(movies);
+            resolve(myMovies);
+        }).fail( function(error){
+            console.log("ERROR");
+            reject(error);
+        });
     });
-  });
 }
+
+
 
 module.exports = {getMovies, addToMyMovies, deleteMovie, searchFirebase, getAllMovies};
 
 
+
+// NOT SUPPOSED TO BE EXPORTED
+// This function is just used within the prior functions for more clarity/modularization
+function filterUser(movies){
+    var filteredMovies = [];
+    for(var i = 0; i < movies.length; i++){
+        if(movies[i].userID === user.getUser()){
+            filteredMovies.push(movies[i]);
+        }
+    }
+    return filteredMovies;
+}
 },{"./firebaseConfig":5,"./user.js":7,"jquery":31}],3:[function(require,module,exports){
 "use strict";
 
@@ -199,39 +216,115 @@ function showSearch(movieData) {
                                     </section>`);
     }
     // $(".add-to-my-watched-movies").click(addToWatched);
-    $(".add-to-my-movies").click(db.addToMyMovies);
+    $(".add-to-my-movies").click(function() {
+        db.addToMyMovies();
+        $("#current-list-visible").html("My Unwatched Movies");
+        $("#search-results").hide();
+        $("#my-movies").show();
+        db.getAllMovies()
+        .then(function(movies) {
+            console.log('movies = ', movies);
+            showMyMovies(movies);
+        });
+    });
 }
 
-// Helper functions for forms stuff. Nothing related to Firebase
-// Build a movie obj from form data.
-// function buildMovieObj() {//this function needs work, but I don't want to mess with it quite yet
-//     let movieObj = {
-//     title: $("#form--title").val(),
-//     artist: $("#form--artist").val(),
-//     album: $("#form--album").val(),
-//     year: $("#form--year").val()
-//   };
-//   return movieObj;
-// }
+function showMyMovies(userMovies) {
+    $("#my-movies").html("");
+    console.log('userMovies = ', userMovies);
+    for (var i = 0; i <userMovies.length; i++) {
+        if (userMovies[i].rating < 1) {
+            $("#my-movies").append(
+                                        `<section id="card-${userMovies[i].id}" class="card-wrapper col-xs-4" >
+                                            <div class="innerCard" style="border: 2px solid black">
+                                                <h3 class="movie-header">${userMovies[i].title}</h3>
+                                                <h4 class="movie-year">${userMovies[i].year}</h4>
+                                                <img src="${userMovies[i].posterURL}" height="200" >
+                                                <h5>${userMovies[i].actors}</h5>
+                                                <div class="stars">
+                                              <form action="">
+                                                <input class="star star-1 radio_item" value="1" id="star-1" type="radio" name="star"/>
+                                                <label class="star star-1 label_item" title="1 Star" for="star-1">1★</label>
+                                                <input class="star star-2 radio_item" value="2" id="star-2" type="radio" name="star"/>
+                                                <label class="star star-2 label_item" title="2 Stars" for="star-2">2★</label>
+                                                <input class="star star-3 radio_item" value="3" id="star-3" type="radio" name="star"/>
+                                                <label class="star star-3 label_item" title="3 Stars" for="star-3">3★</label>
+                                                <input class="star star-4 radio_item" value="4" id="star-4" type="radio" name="star"/>
+                                                <label class="star star-4 label_item" title="4 Stars" for="star-4">4★</label>
+                                                <input class="star star-5 radio_item" value="5" id="star-5" type="radio" name="star"/>
+                                                <label class="star star-5 label_item" title="5 Stars" for="star-5">5★</label>
+                                                <input class="star star-6 radio_item" value="6" id="star-6" type="radio" name="star"/>
+                                                <label class="star star-6 label_item" title="6 Stars" for="star-6">6★</label>
+                                                <input class="star star-7 radio_item" value="7" id="star-7" type="radio" name="star"/>
+                                                <label class="star star-7 label_item" title="7 Stars" for="star-7">7★</label>
+                                                <input class="star star-8 radio_item" value="8" id="star-8" type="radio" name="star"/>
+                                                <label class="star star-8 label_item" title="8 Stars" for="star-8">8★</label>
+                                                <input class="star star-9 radio_item" value="9" id="star-9" type="radio" name="star"/>
+                                                <label class="star star-9 label_item" title="9 Stars" for="star-9">9★</label>
+                                                <input class="star star-10 radio_item" value="10" id="star-10" type="radio" name="star"/>
+                                                <label class="star star-10 label_item" title="10 Stars" for="star-10">10★</label>
+                                              </form>
+                                            </div>
+                                                <button type="button" class="delete-button" value="Delete">Delete</button>
+                                            </div>
+                                        </section>`);
+        }
+    }
+    $(".delete-button").click();
+}
 
+function showMyWatchedMovies(userMovies) {
+    $("#my-watched-movies").html("");
+    var myStars = "";
+    console.log('userMovies = ', userMovies);
+    for (var i = 0; i <userMovies.length; i++) {
+        if (userMovies[i].rating >= 1) {
+            var myRating = userMovies[i].rating;
+            for (var j = 0; j < myRating; j++) {
+                myStars += "★ ";
+            }
+            $("#my-watched-movies").append(
+                                        `<section id="card-${userMovies[i].id}" class="card-wrapper col-xs-4" >
+                                            <div class="innerCard" style="border: 2px solid black">
+                                                <h3 class="movie-header">${userMovies[i].title}</h3>
+                                                <h4 class="movie-year">${userMovies[i].year}</h4>
+                                                <img src="${userMovies[i].posterURL}" height="200" >
+                                                <h5>${userMovies[i].actors}</h5>
+                                                <h6>My Rating: ${myStars}</h6>
+                                                <button type="button" value="Delete">Delete</button>
+                                            </div>
+                                        </section>`);
+        }
+        myStars = "";
+    }
+}
 
-// function createHTML(searchResult) {
-// 	var movieTemplate = document.getElementById('movie-cards').innerHTML;
-// 	var compiledTemplate = Handlebars.compile(movieTemplate);
-// 	var newGeneratedHTML = compiledTemplate(searchResult);
-// 	console.log("movieTemplate", movieTemplate);
+function showMyFavoriteMovies(userMovies) {
+    var myStars = "";
+    $("#my-favorite-movies").html("");
+    console.log('userMovies = ', userMovies);
+    for (var i = 0; i <userMovies.length; i++) {
+        var myRating = userMovies[i].rating;
+        for (var j = 0; j < myRating; j++) {
+            myStars += "★ ";
+        }
+        $("#my-favorite-movies").append(
+                                    `<section id="card-${userMovies[i].id}" class="card-wrapper col-xs-4" >
+                                        <div class="innerCard" style="border: 2px solid black">
+                                            <h3 class="movie-header">${userMovies[i].title}</h3>
+                                            <h4 class="movie-year">${userMovies[i].year}</h4>
+                                            <img src="${userMovies[i].posterURL}" height="200" >
+                                            <h5>${userMovies[i].actors}</h5>
+                                            <h6>User Rating: ${myStars}</h6>
+                                            <button type="button" value="Delete">Delete</button>
+                                        </div>
+                                    </section>`);
+    myStars = "";
+    }
+}
 
-// 	//the next two lines of code put the result of the template into the empty div that the user will see
-// 	var movieContainer = document.getElementById('movie-container');
-// 	movieContainer.innerHTML = newGeneratedHTML;
+module.exports = {showSearch, showMyMovies, showMyWatchedMovies, showMyFavoriteMovies};
 
-// }
-
-
-//probably need to use the first part of the below link for grabbing the poster from the api
-//https://image.tmdb.org/t/p/w500/kqjL17yufvn9OVLyXYpvtyrFfak.jpg
-
-module.exports = {showSearch};
 
 },{"./db-interaction.js":2,"./user.js":7,"hbsfy/runtime":30,"jquery":31}],4:[function(require,module,exports){
 "use strict";
@@ -245,7 +338,6 @@ function getKey() {
 }
 
 module.exports = getKey;
-
 },{}],5:[function(require,module,exports){
 "use strict";
 let firebase = require("firebase/app"),
@@ -274,32 +366,26 @@ let $ = require('jquery'),
 
     movieBuilder = require("./dom-movie-builder"),
     user = require("./user"),
-    api = require("./api-interaction.js");
+    api = require("./api-interaction.js"),
+    userMovies = [];
 
 user.logOut();
 
+
 $( document ).ready(function() {
-// Hides buttons and divs until logged in
-  $(".select-button").hide();
-  $(".hidden-div").hide();
+    // Hides buttons and divs until logged in
+    $(".select-button").hide();
+    $(".hidden-div").hide();
 });
 
 // Using the REST API
 function loadMoviesToDOM(input) {
-  console.log("Where the movies at??", input);
-  db.getMovies(input)
-  .then((movieData)=>{//movieData comes from the getMovies function, by the resolution of the Promise
-    console.log("got data", movieData);
-    // var idArray = Object.keys(movieData);//putting all the keys (in this case, movie names) from the movie list on firebase
-    // idArray.forEach(function(key){
-    //   console.log("MovieData[i]: ", movieData[key]);
-    //   movieData[key].id = key;//this function is getting all of movie ids that are tied to the movie names, preparing the info to be sent into the function that will make the movie list
-    // });
-    // console.log("movie object with id", movieData);
-    // NEED TO POPULATE DOM HERE
-    movieBuilder.showSearch(movieData);
-
-  });
+    console.log("Where the movies at??", input);
+    db.getMovies(input)
+    .then((movieData)=>{//movieData comes from the getMovies function, by the resolution of the Promise
+        // NEED TO POPULATE DOM HERE
+        movieBuilder.showSearch(movieData);
+    });
 }
 
 // listener that askes the user to log in with google when "Sign in" is clicked
@@ -311,7 +397,11 @@ $("#auth-btn").click(function(){
     user.setUser(results.user.uid);
     $(".select-button").show();
     $("#current-list-visible").html("My Movies");
-
+    db.getAllMovies()
+    .then(function(movies){
+      console.log('movies in auth click', movies);
+      userMovies = movies;
+    });
   });
 });
 
@@ -377,14 +467,24 @@ $(".select-button").click(function(event) {
   if (event.currentTarget.id === "unwatched-btn"){
 		$("#current-list-visible").html("My Unwatched Movies");
 		$("#my-movies").show();
+        db.getAllMovies()
+        .then(function(movies) {
+            console.log('movies = ', movies);
+            movieBuilder.showMyMovies(movies);
+        });
   }
   if (event.currentTarget.id === "watched-btn") {
 		$("#current-list-visible").html("My Watched Movies");
 		$("#my-watched-movies").show();
+        db.getAllMovies()
+        .then(function(movies) {
+            movieBuilder.showMyWatchedMovies(movies);
+        });
 	}
 	if (event.currentTarget.id === "favorites-btn") {
 		$("#current-list-visible").html("My Favorites");
 		$("#favorites").show();
+        db.getAllMovies();
 	}
 });
 
@@ -410,26 +510,33 @@ function findDuplicates(searchedMovies, firebaseMoviesFound){
             }
         }
     }
-    console.log("FINAL MOVIES THAT WILL POPULATE THE DOM (upon hitting enter):\n", combinedMoviesToShow);
+    console.log("MOVIES THAT WILL POPULATE THE DOM (upon hitting enter):\n", combinedMoviesToShow);
 }
 
 
-// Slider 
+// Slider
 $(document).on("input", "#slider", function(event){
     var newNum = parseInt(event.target.value);
 
     db.getAllMovies()
     .then( function(movies){
-
+        console.log("MY MOVIES: ", movies);
         var filteredMovies = [];
         for(var i = 0; i < movies.length; i++){
             if(parseInt(movies[i].rating) >= newNum){
                 filteredMovies.push(movies[i]);
             }
         }
+        if(filteredMovies.length === 0){
+            // Tell user that they have no movies with this rating or greater
+        }
         console.log("FILTERED: ", filteredMovies);
+        // Populate DOM with filteredMovies here
+        movieBuilder.showMyFavoriteMovies(filteredMovies);
     });
 });
+
+
 
 
 

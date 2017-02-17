@@ -52,36 +52,112 @@ function showSearch(movieData) {
                                     </section>`);
     }
     // $(".add-to-my-watched-movies").click(addToWatched);
-    $(".add-to-my-movies").click(db.addToMyMovies);
+    $(".add-to-my-movies").click(function() {
+        db.addToMyMovies();
+        $("#current-list-visible").html("My Unwatched Movies");
+        $("#search-results").hide();
+        $("#my-movies").show();
+        db.getAllMovies()
+        .then(function(movies) {
+            console.log('movies = ', movies);
+            showMyMovies(movies);
+        });
+    });
 }
 
-// Helper functions for forms stuff. Nothing related to Firebase
-// Build a movie obj from form data.
-// function buildMovieObj() {//this function needs work, but I don't want to mess with it quite yet
-//     let movieObj = {
-//     title: $("#form--title").val(),
-//     artist: $("#form--artist").val(),
-//     album: $("#form--album").val(),
-//     year: $("#form--year").val()
-//   };
-//   return movieObj;
-// }
+function showMyMovies(userMovies) {
+    $("#my-movies").html("");
+    console.log('userMovies = ', userMovies);
+    for (var i = 0; i <userMovies.length; i++) {
+        if (userMovies[i].rating < 1) {
+            $("#my-movies").append(
+                                        `<section id="card-${userMovies[i].id}" class="card-wrapper col-xs-4" >
+                                            <div class="innerCard" style="border: 2px solid black">
+                                                <h3 class="movie-header">${userMovies[i].title}</h3>
+                                                <h4 class="movie-year">${userMovies[i].year}</h4>
+                                                <img src="${userMovies[i].posterURL}" height="200" >
+                                                <h5>${userMovies[i].actors}</h5>
+                                                <div class="stars">
+                                              <form action="">
+                                                <input class="star star-1 radio_item" value="1" id="star-1" type="radio" name="star"/>
+                                                <label class="star star-1 label_item" title="1 Star" for="star-1">1★</label>
+                                                <input class="star star-2 radio_item" value="2" id="star-2" type="radio" name="star"/>
+                                                <label class="star star-2 label_item" title="2 Stars" for="star-2">2★</label>
+                                                <input class="star star-3 radio_item" value="3" id="star-3" type="radio" name="star"/>
+                                                <label class="star star-3 label_item" title="3 Stars" for="star-3">3★</label>
+                                                <input class="star star-4 radio_item" value="4" id="star-4" type="radio" name="star"/>
+                                                <label class="star star-4 label_item" title="4 Stars" for="star-4">4★</label>
+                                                <input class="star star-5 radio_item" value="5" id="star-5" type="radio" name="star"/>
+                                                <label class="star star-5 label_item" title="5 Stars" for="star-5">5★</label>
+                                                <input class="star star-6 radio_item" value="6" id="star-6" type="radio" name="star"/>
+                                                <label class="star star-6 label_item" title="6 Stars" for="star-6">6★</label>
+                                                <input class="star star-7 radio_item" value="7" id="star-7" type="radio" name="star"/>
+                                                <label class="star star-7 label_item" title="7 Stars" for="star-7">7★</label>
+                                                <input class="star star-8 radio_item" value="8" id="star-8" type="radio" name="star"/>
+                                                <label class="star star-8 label_item" title="8 Stars" for="star-8">8★</label>
+                                                <input class="star star-9 radio_item" value="9" id="star-9" type="radio" name="star"/>
+                                                <label class="star star-9 label_item" title="9 Stars" for="star-9">9★</label>
+                                                <input class="star star-10 radio_item" value="10" id="star-10" type="radio" name="star"/>
+                                                <label class="star star-10 label_item" title="10 Stars" for="star-10">10★</label>
+                                              </form>
+                                            </div>
+                                                <button type="button" class="delete-button" value="Delete">Delete</button>
+                                            </div>
+                                        </section>`);
+        }
+    }
+    $(".delete-button").click();
+}
 
+function showMyWatchedMovies(userMovies) {
+    $("#my-watched-movies").html("");
+    var myStars = "";
+    console.log('userMovies = ', userMovies);
+    for (var i = 0; i <userMovies.length; i++) {
+        if (userMovies[i].rating >= 1) {
+            var myRating = userMovies[i].rating;
+            for (var j = 0; j < myRating; j++) {
+                myStars += "★ ";
+            }
+            $("#my-watched-movies").append(
+                                        `<section id="card-${userMovies[i].id}" class="card-wrapper col-xs-4" >
+                                            <div class="innerCard" style="border: 2px solid black">
+                                                <h3 class="movie-header">${userMovies[i].title}</h3>
+                                                <h4 class="movie-year">${userMovies[i].year}</h4>
+                                                <img src="${userMovies[i].posterURL}" height="200" >
+                                                <h5>${userMovies[i].actors}</h5>
+                                                <h6>My Rating: ${myStars}</h6>
+                                                <button type="button" value="Delete">Delete</button>
+                                            </div>
+                                        </section>`);
+        }
+        myStars = "";
+    }
+}
 
-// function createHTML(searchResult) {
-// 	var movieTemplate = document.getElementById('movie-cards').innerHTML;
-// 	var compiledTemplate = Handlebars.compile(movieTemplate);
-// 	var newGeneratedHTML = compiledTemplate(searchResult);
-// 	console.log("movieTemplate", movieTemplate);
+function showMyFavoriteMovies(userMovies) {
+    var myStars = "";
+    $("#my-favorite-movies").html("");
+    console.log('userMovies = ', userMovies);
+    for (var i = 0; i <userMovies.length; i++) {
+        var myRating = userMovies[i].rating;
+        for (var j = 0; j < myRating; j++) {
+            myStars += "★ ";
+        }
+        $("#my-favorite-movies").append(
+                                    `<section id="card-${userMovies[i].id}" class="card-wrapper col-xs-4" >
+                                        <div class="innerCard" style="border: 2px solid black">
+                                            <h3 class="movie-header">${userMovies[i].title}</h3>
+                                            <h4 class="movie-year">${userMovies[i].year}</h4>
+                                            <img src="${userMovies[i].posterURL}" height="200" >
+                                            <h5>${userMovies[i].actors}</h5>
+                                            <h6>User Rating: ${myStars}</h6>
+                                            <button type="button" value="Delete">Delete</button>
+                                        </div>
+                                    </section>`);
+    myStars = "";
+    }
+}
 
-// 	//the next two lines of code put the result of the template into the empty div that the user will see
-// 	var movieContainer = document.getElementById('movie-container');
-// 	movieContainer.innerHTML = newGeneratedHTML;
+module.exports = {showSearch, showMyMovies, showMyWatchedMovies, showMyFavoriteMovies};
 
-// }
-
-
-//probably need to use the first part of the below link for grabbing the poster from the api
-//https://image.tmdb.org/t/p/w500/kqjL17yufvn9OVLyXYpvtyrFfak.jpg
-
-module.exports = {showSearch};

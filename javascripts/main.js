@@ -5,7 +5,8 @@ let $ = require('jquery'),
 
     movieBuilder = require("./dom-movie-builder"),
     user = require("./user"),
-    api = require("./api-interaction.js");
+    api = require("./api-interaction.js"),
+    userMovies = [];
 
 user.logOut();
 
@@ -28,17 +29,19 @@ function loadMoviesToDOM(input) {
 
 // listener that askes the user to log in with google when "Sign in" is clicked
 $("#auth-btn").click(function(){
-    console.log("clicked auth");
-    user.logInGoogle()
-    .then(function(results){
-        user.setUser(results.user.uid);
-        $(".select-button").show();
-        $("#current-list-visible").html("My Movies");
-        db.getAllMovies()
-        .then( function(movies){
-            console.log("Your Movies: ", movies);
-        });
+  console.log("clicked auth");
+  user.logInGoogle()
+  .then(function(results){
+    console.log("result from login", results.user.uid);
+    user.setUser(results.user.uid);
+    $(".select-button").show();
+    $("#current-list-visible").html("My Movies");
+    db.getAllMovies()
+    .then(function(movies){
+      console.log('movies in auth click', movies);
+      userMovies = movies;
     });
+  });
 });
 
 // listener that logs the user out when "logout" is clicked
@@ -103,14 +106,24 @@ $(".select-button").click(function(event) {
   if (event.currentTarget.id === "unwatched-btn"){
 		$("#current-list-visible").html("My Unwatched Movies");
 		$("#my-movies").show();
+        db.getAllMovies()
+        .then(function(movies) {
+            console.log('movies = ', movies);
+            movieBuilder.showMyMovies(movies);
+        });
   }
   if (event.currentTarget.id === "watched-btn") {
 		$("#current-list-visible").html("My Watched Movies");
 		$("#my-watched-movies").show();
+        db.getAllMovies()
+        .then(function(movies) {
+            movieBuilder.showMyWatchedMovies(movies);
+        });
 	}
 	if (event.currentTarget.id === "favorites-btn") {
 		$("#current-list-visible").html("My Favorites");
 		$("#favorites").show();
+        db.getAllMovies();
 	}
 });
 
@@ -140,7 +153,7 @@ function findDuplicates(searchedMovies, firebaseMoviesFound){
 }
 
 
-// Slider 
+// Slider
 $(document).on("input", "#slider", function(event){
     var newNum = parseInt(event.target.value);
 
@@ -158,6 +171,7 @@ $(document).on("input", "#slider", function(event){
         }
         console.log("FILTERED: ", filteredMovies);
         // Populate DOM with filteredMovies here
+        movieBuilder.showMyFavoriteMovies(filteredMovies);
     });
 });
 
