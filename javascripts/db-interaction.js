@@ -26,7 +26,7 @@ function getMovies(searchResult){
   return new Promise(function(resolve, reject){
     $.ajax({
       // url: `https://movie-history-6e707.firebaseio.com?orderBy="uid"&equalTo="${user}"`
-      url: `https://api.themoviedb.org/3/search/movie?api_key=56696d263700546dd8f63b84a5e3d534&query=${searchResult}`,
+      url: `https://api.themoviedb.org/3/search/movie?api_key=XXXXXXXXXXXXXXXXXXXXXXXXX&query=${searchResult}`,
       type: "GET"
     }).done( function(movieData){
       // var movies = Object.values("movieData");
