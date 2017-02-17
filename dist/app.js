@@ -216,7 +216,17 @@ function showSearch(movieData) {
                                     </section>`);
     }
     // $(".add-to-my-watched-movies").click(addToWatched);
-    $(".add-to-my-movies").click(db.addToMyMovies);
+    $(".add-to-my-movies").click(function() {
+        db.addToMyMovies();
+        $("#current-list-visible").html("My Unwatched Movies");
+        $("#search-results").hide();
+        $("#my-movies").show();
+        db.getAllMovies()
+        .then(function(movies) {
+            console.log('movies = ', movies);
+            showMyMovies(movies);
+        });
+    });
 }
 
 function showMyMovies(userMovies) {
@@ -255,18 +265,24 @@ function showMyMovies(userMovies) {
                                                 <label class="star star-10 label_item" title="10 Stars" for="star-10">10★</label>
                                               </form>
                                             </div>
-                                                <button type="button" value="Delete">Delete</button>
+                                                <button type="button" class="delete-button" value="Delete">Delete</button>
                                             </div>
                                         </section>`);
         }
     }
+    $(".delete-button").click();
 }
 
 function showMyWatchedMovies(userMovies) {
     $("#my-watched-movies").html("");
+    var myStars = "";
     console.log('userMovies = ', userMovies);
     for (var i = 0; i <userMovies.length; i++) {
         if (userMovies[i].rating >= 1) {
+            var myRating = userMovies[i].rating;
+            for (var j = 0; j < myRating; j++) {
+                myStars += "★ ";
+            }
             $("#my-watched-movies").append(
                                         `<section id="card-${userMovies[i].id}" class="card-wrapper col-xs-4" >
                                             <div class="innerCard" style="border: 2px solid black">
@@ -274,18 +290,24 @@ function showMyWatchedMovies(userMovies) {
                                                 <h4 class="movie-year">${userMovies[i].year}</h4>
                                                 <img src="${userMovies[i].posterURL}" height="200" >
                                                 <h5>${userMovies[i].actors}</h5>
-                                                <h6>User Rating: ${userMovies[i].rating}</h6>
+                                                <h6>My Rating: ${myStars}</h6>
                                                 <button type="button" value="Delete">Delete</button>
                                             </div>
                                         </section>`);
         }
+        myStars = "";
     }
 }
 
 function showMyFavoriteMovies(userMovies) {
+    var myStars = "";
     $("#my-favorite-movies").html("");
     console.log('userMovies = ', userMovies);
     for (var i = 0; i <userMovies.length; i++) {
+        var myRating = userMovies[i].rating;
+        for (var j = 0; j < myRating; j++) {
+            myStars += "★ ";
+        }
         $("#my-favorite-movies").append(
                                     `<section id="card-${userMovies[i].id}" class="card-wrapper col-xs-4" >
                                         <div class="innerCard" style="border: 2px solid black">
@@ -293,41 +315,13 @@ function showMyFavoriteMovies(userMovies) {
                                             <h4 class="movie-year">${userMovies[i].year}</h4>
                                             <img src="${userMovies[i].posterURL}" height="200" >
                                             <h5>${userMovies[i].actors}</h5>
-                                            <h6>User Rating: ${userMovies[i].rating}</h6>
+                                            <h6>User Rating: ${myStars}</h6>
                                             <button type="button" value="Delete">Delete</button>
                                         </div>
                                     </section>`);
+    myStars = "";
     }
 }
-
-// Helper functions for forms stuff. Nothing related to Firebase
-// Build a movie obj from form data.
-// function buildMovieObj() {//this function needs work, but I don't want to mess with it quite yet
-//     let movieObj = {
-//     title: $("#form--title").val(),
-//     artist: $("#form--artist").val(),
-//     album: $("#form--album").val(),
-//     year: $("#form--year").val()
-//   };
-//   return movieObj;
-// }
-
-
-// function createHTML(searchResult) {
-// 	var movieTemplate = document.getElementById('movie-cards').innerHTML;
-// 	var compiledTemplate = Handlebars.compile(movieTemplate);
-// 	var newGeneratedHTML = compiledTemplate(searchResult);
-// 	console.log("movieTemplate", movieTemplate);
-
-// 	//the next two lines of code put the result of the template into the empty div that the user will see
-// 	var movieContainer = document.getElementById('movie-container');
-// 	movieContainer.innerHTML = newGeneratedHTML;
-
-// }
-
-
-//probably need to use the first part of the below link for grabbing the poster from the api
-//https://image.tmdb.org/t/p/w500/kqjL17yufvn9OVLyXYpvtyrFfak.jpg
 
 module.exports = {showSearch, showMyMovies, showMyWatchedMovies, showMyFavoriteMovies};
 
